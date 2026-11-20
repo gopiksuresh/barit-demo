@@ -1,0 +1,203 @@
+// BARit demo schema. All money is integer paise.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum VenueType {
+  RESTAURANT
+  BAR
+}
+
+enum StaffRole {
+  OWNER
+  STAFF
+  KITCHEN
+}
+
+enum SessionStatus {
+  OPEN
+  PAYING
+  CLOSED
+}
+
+enum OrderStatus {
+  ORDERED
+  COOKING
+  READY
+  SERVED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  RAZORPAY
+  CASH
+  CARD
+}
+
+enum PaymentStatus {
+  CREATED
+  PAID
+  FAILED
+}
+
+model Venue {
+  id         String        @id @default(cuid())
+  slug       String        @unique
+  name       String
+  type       VenueType
+  address    String
+  lat        Float
+  lng        Float
+  isOpen     Boolean       @default(true)
+  createdAt  DateTime      @default(now())
+  categories Category[]
+  tables     DiningTable[]
+  staff      StaffUser[]
+}
+
+model Category {
+  id         String     @id @default(cuid())
+  venueId    String
+  venue      Venue      @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  name       String
+  sortOrder  Int        @default(0)
+  gstRatePct Decimal    @default(5) @db.Decimal(5, 2)
+  items      MenuItem[]
+
+  @@index([venueId])
+}
+
+model MenuItem {
+  id          String    @id @default(cuid())
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  imageUrl    String?
+  isVeg       Boolean   @default(false)
+  isSpecial   Boolean   @default(false)
+  isAvailable Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  archived    Boolean   @default(false)
+  portions    Portion[]
+
+  @@index([categoryId])
+}
+
+model Portion {
+  id         String      @id @default(cuid())
+  itemId     String
+  item       MenuItem    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  label      String
+  pricePaise Int
+  sortOrder  Int         @default(0)
+  archived   Boolean     @default(false)
+  orderItems OrderItem[]
+
+  @@index([itemId])
+}
+
+model DiningTable {
+  id       String         @id @default(cuid())
+  venueId  String
+  venue    Venue          @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  number   Int
+  seats    Int            @default(4)
+  qrToken  String         @unique
+  sessions TableSession[]
+
+  @@unique([venueId, number])
+}
+
+model StaffUser {
+  id          String    @id @default(cuid())
+  phone       String    @unique // E.164, e.g. +919999900001
+  firebaseUid String?   @unique
+  name        String?
+  role        StaffRole
+  venueId     String
+  venue       Venue     @relation(fields: [venueId], references: [id], onDelete: Cascade)
+}
+
+model Guest {
+  id          String   @id @default(cuid())
+  firebaseUid String   @unique
+  phone       String
+  name        String?
+  createdAt   DateTime @default(now())
+  orders      Order[]
+}
+
+model TableSession {
+  id       String        @id @default(cuid())
+  tableId  String
+  table    DiningTable   @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  status   SessionStatus @default(OPEN)
+  openedAt DateTime      @default(now())
+  closedAt DateTime?
+  orders   Order[]
+  payments Payment[]
+
+  @@index([tableId, status])
+}
+
+model Order {
+  id          String       @id @default(cuid())
+  sessionId   String
+  session     TableSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  guestId     String
+  guest       Guest        @relation(fields: [guestId], references: [id])
+  status      OrderStatus  @default(ORDERED)
+  notes       String?
+  placedAt    DateTime     @default(now())
+  cookingAt   DateTime?
+  readyAt     DateTime?
+  servedAt    DateTime?
+  cancelledAt DateTime?
+  updatedAt   DateTime     @updatedAt
+  items       OrderItem[]
+
+  @@index([sessionId])
+  @@index([status, updatedAt])
+}
+
+model OrderItem {
+  id             String  @id @default(cuid())
+  orderId        String
+  order          Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  portionId      String
+  portion        Portion @relation(fields: [portionId], references: [id])
+  itemName       String
+  portionLabel   String
+  qty            Int
+  unitPricePaise Int
+  gstRatePct     Decimal @db.Decimal(5, 2)
+  notes          String?
+
+  @@index([orderId])
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  sessionId         String
+  session           TableSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  subtotalPaise     Int
+  gstPaise          Int
+  tipPaise          Int           @default(0)
+  totalPaise        Int
+  method            PaymentMethod
+  status            PaymentStatus @default(CREATED)
+  razorpayOrderId   String?       @unique
+  razorpayPaymentId String?
+  createdAt         DateTime      @default(now())
+  paidAt            DateTime?
+
+  @@index([sessionId])
+}

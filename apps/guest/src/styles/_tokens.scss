@@ -1,0 +1,109 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// BARit guest — design tokens. "Kerala after dark."
+//
+// Components reference ONLY these custom properties (never raw colours), so a light
+// theme is a matter of adding a token block — see the template at the bottom.
+// ─────────────────────────────────────────────────────────────────────────────
+
+:root {
+  color-scheme: dark;
+
+  // Surfaces
+  --bg: #0e0c0a;                 // warm near-black base
+  --surface-1: #17140f;          // cards
+  --surface-2: #211c16;          // raised: sheets, active chips, inputs
+  --surface-3: #2b241c;          // pressed / hover on raised
+  --border: rgba(255, 236, 210, 0.08);
+  --border-strong: rgba(255, 236, 210, 0.16);
+  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.04); // soft top edge instead of drop shadows
+  --scrim: rgba(8, 6, 4, 0.62);
+  --glass: rgba(14, 12, 10, 0.75);
+
+  // Text
+  --text-primary: #f5ede1;
+  --text-secondary: #b8ac9a;
+  // Brief specified #7D7365; nudged lighter to pass WCAG AA (4.9–5.7:1 on all surfaces).
+  --text-muted: #948977;
+  --text-on-accent: #1a1206;
+
+  // Accent — brass / saffron
+  --accent: #e8a43a;
+  --accent-strong: #f2b552;
+  --accent-soft: rgba(232, 164, 58, 0.14);
+  --accent-glow: rgba(232, 164, 58, 0.35);
+
+  // Semantic
+  --veg: #4caf6a;
+  --nonveg: #d9534f;
+  --success: #5cc58a;
+  --success-soft: rgba(92, 197, 138, 0.14);
+  --danger: #e5675f;
+  --danger-soft: rgba(229, 103, 95, 0.14);
+
+  // Image fallback — amber → teak
+  --fallback-gradient: radial-gradient(120% 90% at 20% 10%, #c98a2e 0%, #8a5420 45%, #3b2412 100%);
+  --fallback-ink: rgba(255, 241, 220, 0.92);
+
+  // Page atmosphere
+  --page-glow: radial-gradient(120% 55% at 50% -12%, rgba(232, 164, 58, 0.06), transparent 62%);
+
+  // Typography
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-ui: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fs-28: 1.75rem;
+  --fs-22: 1.375rem;
+  --fs-18: 1.125rem;
+  --fs-16: 1rem;
+  --fs-14: 0.875rem;
+  --fs-12: 0.75rem;
+
+  // Shape
+  --radius-card: 20px;
+  --radius-btn: 14px;
+  --radius-pill: 999px;
+  --radius-thumb: 16px;
+
+  // Spacing (4/8 grid)
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --gutter: 20px;
+
+  // Layout
+  --shell-max: 480px;
+  --bar-h: 56px;      // compact header
+  --tap: 44px;        // minimum tap target
+
+  // Motion
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 150ms;
+  --dur: 200ms;
+  --dur-slow: 250ms;
+}
+
+// ── Light theme template ─────────────────────────────────────────────────────
+// To add a light theme later, uncomment and tune, then set <html data-theme="light">
+// (or wrap in @media (prefers-color-scheme: light)). No component changes needed.
+//
+// [data-theme='light'] {
+//   color-scheme: light;
+//   --bg: #fbf7ee;
+//   --surface-1: #ffffff;
+//   --surface-2: #f5eedc;
+//   --surface-3: #ece2c9;
+//   --border: rgba(60, 40, 10, 0.1);
+//   --border-strong: rgba(60, 40, 10, 0.2);
+//   --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+//   --glass: rgba(251, 247, 238, 0.8);
+//   --text-primary: #1f1a12;
+//   --text-secondary: #5b5143;
+//   --text-muted: #6f6556;
+//   --accent: #a86a10;          // darker brass for AA on light
+//   --text-on-accent: #ffffff;
+//   --page-glow: radial-gradient(120% 55% at 50% -12%, rgba(232, 164, 58, 0.12), transparent 62%);
+// }

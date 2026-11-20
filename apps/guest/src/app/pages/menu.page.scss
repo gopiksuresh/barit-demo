@@ -1,0 +1,213 @@
+@use 'mixins' as *;
+
+$sticky-top: calc(var(--bar-h) + env(safe-area-inset-top, 0px));
+
+
+/* ── Compact glass bar ─────────────────────────────────────────────────── */
+.compact-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  height: $sticky-top;
+  padding: env(safe-area-inset-top, 0px) var(--s-2) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border-bottom: 1px solid var(--border);
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform var(--dur-slow) var(--ease-out), opacity var(--dur) var(--ease-out);
+  &.show { transform: none; opacity: 1; }
+}
+.cb-name {
+  flex: 1;
+  min-width: 0;
+  @include display(var(--fs-18));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: var(--s-1);
+}
+
+/* ── Table pill in the compact bar (hero has its own) ────────────────────────────────────────── */
+.table-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, #f0b450, var(--accent));
+  color: var(--text-on-accent);
+  font-weight: 700;
+  font-size: var(--fs-12);
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 0 1px rgba(255, 220, 160, 0.35) inset, 0 0 18px var(--accent-glow);
+  &.small { padding: 4px 10px; margin-right: var(--s-1); }
+}
+
+/* ── Hero (component: shared/venue-hero) ────────────────────────────── */
+.hero-wrap { position: relative; }
+.hero-sentinel { position: absolute; bottom: 0; left: 0; height: 1px; width: 1px; }
+
+.notice {
+  margin: var(--s-3) var(--gutter) 0;
+  padding: var(--s-3) var(--s-4);
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  border-radius: var(--radius-btn);
+  background: var(--accent-soft);
+  color: var(--text-primary);
+  font-size: var(--fs-14);
+  &.warn { background: var(--danger-soft); }
+}
+
+/* ── Search ────────────────────────────────────────────────────────────── */
+.search-wrap { padding: var(--s-4) var(--gutter) var(--s-1); }
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 0 var(--s-2) 0 var(--s-4);
+  min-height: 48px;
+  border-radius: var(--radius-btn);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  box-shadow: var(--highlight);
+  color: var(--text-muted);
+  transition: border-color var(--dur) var(--ease-out);
+  &:focus-within { border-color: var(--accent); color: var(--accent); }
+  input {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    min-height: 46px;
+    &:focus { border: 0; }
+    &::-webkit-search-cancel-button { display: none; }
+  }
+}
+.clear { @include bare-button; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; color: var(--text-secondary); }
+
+/* ── Chips (sticky) & filters ──────────────────────────────────────────── */
+.chip-bar {
+  position: sticky;
+  top: $sticky-top;
+  z-index: 20;
+  background: var(--bg);
+  // Soft fade below the bar, so rows dissolve under it instead of being sliced.
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 14px;
+    background: linear-gradient(var(--bg), transparent);
+    pointer-events: none;
+  }
+  padding: var(--s-2) 0;
+}
+.chips {
+  position: relative;
+  display: flex;
+  gap: var(--s-2);
+  overflow-x: auto;
+  padding: 0 var(--gutter);
+  scroll-padding-inline: var(--gutter);
+  @include no-scrollbar;
+}
+.nav-chip {
+  @include bare-button;
+  @include pressable;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap);
+  padding: 0 var(--s-4);
+  border-radius: var(--radius-pill);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: var(--fs-14);
+  &:hover { color: var(--text-primary); }
+  &.active { background: var(--accent); border-color: transparent; color: var(--text-on-accent); }
+}
+.filters {
+  display: flex;
+  gap: var(--s-2);
+  padding: 0 var(--gutter) var(--s-2);
+  overflow-x: auto;
+  @include no-scrollbar;
+}
+.filter {
+  @include bare-button;
+  @include pressable;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 var(--s-3);
+  border-radius: 10px;
+  border: 1px dashed var(--border-strong);
+  color: var(--text-secondary);
+  font-size: var(--fs-12);
+  font-weight: 600;
+  &.on { border-style: solid; border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+  .sq { width: 12px; height: 12px; border: 1.5px solid var(--veg); border-radius: 3px; display: grid; place-items: center; }
+  .sq::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--veg); }
+}
+
+/* ── Sections ──────────────────────────────────────────────────────────── */
+.menu { padding: 0 0 calc(120px + env(safe-area-inset-bottom, 0px)); }
+.sec { padding-top: var(--s-5); }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; padding: 0 var(--gutter) var(--s-3); }
+.sec-title { @include display(var(--fs-22)); }
+
+/* ── Specials carousel (card: shared/special-card) ─────────────────────────────────────────────────── */
+.carousel {
+  display: flex;
+  gap: var(--s-3);
+  overflow-x: auto;
+  padding: var(--s-1) var(--gutter) var(--s-2);
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  @include no-scrollbar;
+}
+
+/* ── Item rows (row itself: shared/menu-item-row) ─────────────────────── */
+.items { list-style: none; margin: 0; padding: 0 var(--gutter); }
+.items > li { border-bottom: 1px solid var(--border); }
+.items > li:last-child { border-bottom: 0; }
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--s-3);
+  padding: var(--s-8) var(--gutter);
+  color: var(--text-secondary);
+  text-align: center;
+}
+.fine { padding: var(--s-6) var(--gutter) 0; color: var(--text-muted); font-size: var(--fs-12); text-align: center; }
+
+/* ── Floating cart bar: spring enter/leave (bar itself: shared/cart-bar) ── */
+.cart-in { animation: cart-in 420ms var(--ease-spring); }
+.cart-out { animation: cart-out var(--dur) var(--ease-out) forwards; }
+@keyframes cart-in { from { transform: translateY(140%); } }
+@keyframes cart-out { to { transform: translateY(140%); opacity: 0; } }
+
+/* ── Loading / error ───────────────────────────────────────────────────── */
+.sk-hero { height: 280px; border-radius: 0; }
+.sk { padding-top: var(--s-4); }
+.error-page { padding-top: calc(var(--s-8) + env(safe-area-inset-top, 0px)); }

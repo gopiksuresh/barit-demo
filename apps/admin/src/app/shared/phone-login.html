@@ -1,0 +1,26 @@
+@if (busy()) { <mat-progress-bar mode="indeterminate" /> }
+@if (step() === 'phone') {
+  <form (ngSubmit)="send()" class="stack">
+    <mat-form-field appearance="outline">
+      <mat-label>Mobile number</mat-label>
+      <span matTextPrefix>+91&nbsp;</span>
+      <input matInput name="phone" type="tel" inputmode="numeric" maxlength="10" [ngModel]="phone()" (ngModelChange)="phone.set($event)" required autofocus />
+      <mat-hint>Staff number registered for your venue</mat-hint>
+    </mat-form-field>
+    <button mat-flat-button [disabled]="busy() || !validPhone()">Send OTP</button>
+  </form>
+} @else {
+  <form (ngSubmit)="verify()" class="stack">
+    <p>Code sent to <strong>+91 {{ phone() }}</strong> · <a href="" (click)="$event.preventDefault(); step.set('phone')">change</a></p>
+    <mat-form-field appearance="outline">
+      <mat-label>6-digit OTP</mat-label>
+      <input matInput name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" [ngModel]="code()" (ngModelChange)="code.set($event)" required autofocus />
+    </mat-form-field>
+    <button mat-flat-button [disabled]="busy() || code().length !== 6">Verify &amp; sign in</button>
+    @if (dev) {
+      <button mat-button type="button" (click)="fillFromEmulator()">Dev: fill code from Auth emulator</button>
+    }
+  </form>
+}
+@if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+<div #recaptcha></div>

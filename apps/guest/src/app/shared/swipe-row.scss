@@ -1,0 +1,33 @@
+:host {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--dur-slow) var(--ease-out) 60ms, opacity var(--dur) var(--ease-out) 60ms;
+}
+:host(.leaving) { grid-template-rows: 0fr; opacity: 0; }
+
+.action {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding-right: var(--s-5);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-weight: 700;
+  font-size: var(--fs-12);
+  transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+  &.armed { background: var(--danger); color: #1a0806; }
+}
+
+.content {
+  position: relative;
+  min-height: 0;
+  background: var(--surface-1);
+  touch-action: pan-y;
+  transition: transform var(--dur-slow) var(--ease-out);
+  &.dragging { transition: none; }
+}

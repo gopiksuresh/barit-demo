@@ -1,0 +1,45 @@
+<div class="kds">
+  <header>
+    <div class="title"><mat-icon>soup_kitchen</mat-icon> Kitchen · {{ staff.me()?.venue?.name }}</div>
+    <div class="right">
+      @if (error()) { <span class="err">⚠ {{ error() }}</span> } @else { <span class="live"><i></i> Live</span> }
+      <span class="clock">{{ clock() }}</span>
+      @if (staff.canEditMenu()) { <a mat-button routerLink="/orders" class="exit"><mat-icon>close</mat-icon> Exit</a> }
+      @else { <button mat-button class="exit" (click)="logout()"><mat-icon>logout</mat-icon> Sign out</button> }
+    </div>
+  </header>
+
+  <div class="cols">
+    @for (col of columns; track col) {
+      <section class="col" [attr.data-col]="col">
+        <h2>{{ label(col) }} <span class="count">{{ byStatus()[col].length }}</span></h2>
+        <div class="tickets">
+          @for (o of byStatus()[col]; track o.id) {
+            <article class="ticket" [class.fresh]="isFresh(o)" [class.late]="ageMin(o) >= 15">
+              <div class="trow">
+                <span class="tno">T{{ o.tableNumber }}</span>
+                <span class="age">{{ ageLabel(o) }}</span>
+              </div>
+              <ul>
+                @for (it of o.items; track it.id) {
+                  <li><b>{{ it.qty }}×</b> {{ it.itemName }} <span class="portion">{{ it.portionLabel }}</span>
+                    @if (it.notes) { <div class="inote">↳ {{ it.notes }}</div> }
+                  </li>
+                }
+              </ul>
+              @if (o.notes) { <div class="note">“{{ o.notes }}”</div> }
+              <div class="acts">
+                @if (o.status === 'ORDERED') {
+                  <button class="cancel" (click)="advance(o, 'CANCELLED')" [disabled]="pending().has(o.id)">Cancel</button>
+                }
+                <button class="go" (click)="advance(o, next(o)!.to)" [disabled]="pending().has(o.id)">{{ next(o)!.label }} →</button>
+              </div>
+            </article>
+          } @empty {
+            <div class="none">—</div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+</div>

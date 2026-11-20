@@ -1,0 +1,58 @@
+<div class="head">
+  <div>
+    <h1>Live orders</h1>
+    <p class="sub">Every table’s orders and running bill. Updates every few seconds.</p>
+  </div>
+  <mat-button-toggle-group [value]="filter()" (change)="filter.set($event.value)" hideSingleSelectionIndicator>
+    <mat-button-toggle value="active">Active ({{ activeCount() }})</mat-button-toggle>
+    <mat-button-toggle value="closed">Settled</mat-button-toggle>
+  </mat-button-toggle-group>
+</div>
+
+@if (error()) { <p class="error">{{ error() }}</p> }
+
+<div class="grid">
+  @for (s of shown(); track s.id) {
+    <mat-card appearance="outlined" class="sess" [class.paying]="s.status === 'PAYING'" [class.closed]="s.status === 'CLOSED'">
+      <div class="top">
+        <div class="tno">T{{ s.tableNumber }}</div>
+        <div class="grow">
+          <div class="status">{{ statusLabel(s) }}</div>
+          <div class="since">since {{ s.openedAt | date: 'shortTime' }}</div>
+        </div>
+        <div class="total">{{ (s.payment?.status === 'PAID' ? s.payment!.totalPaise : s.bill.subtotalPaise + s.bill.gstPaise) | inr }}</div>
+      </div>
+
+      @for (o of s.orders; track o.id) {
+        <div class="order">
+          <div class="orow">
+            <span class="who">{{ o.guestName || maskPhone(o.guestPhone) }} · {{ o.placedAt | date: 'shortTime' }}</span>
+            <span class="pill" [attr.data-s]="o.status">{{ label(o.status) }}</span>
+          </div>
+          <ul>
+            @for (it of o.items; track it.id) { <li>{{ it.qty }}× {{ it.itemName }} <span class="muted">{{ it.portionLabel }}</span></li> }
+          </ul>
+          @if (o.notes) { <div class="note">“{{ o.notes }}”</div> }
+        </div>
+      }
+
+      @if (s.status !== 'CLOSED') {
+        <div class="foot">
+          <span class="muted">Subtotal {{ s.bill.subtotalPaise | inr }} + GST {{ s.bill.gstPaise | inr }}</span>
+          <button mat-stroked-button [matMenuTriggerFor]="pay"><mat-icon>payments</mat-icon> Mark paid</button>
+          <mat-menu #pay="matMenu">
+            <button mat-menu-item (click)="markPaid(s, 'CASH')"><mat-icon>money</mat-icon> Cash at counter</button>
+            <button mat-menu-item (click)="markPaid(s, 'CARD')"><mat-icon>credit_card</mat-icon> Card at counter</button>
+          </mat-menu>
+        </div>
+      } @else {
+        <div class="foot paid"><mat-icon>check_circle</mat-icon> Paid · {{ methodLabel(s.payment?.method) }} @if (s.bill.tipPaise) { · tip {{ s.bill.tipPaise | inr }} }</div>
+      }
+    </mat-card>
+  } @empty {
+    <div class="empty">
+      <mat-icon>table_restaurant</mat-icon>
+      <p>{{ filter() === 'active' ? 'No active tables right now. Orders appear here as guests scan and order.' : 'No settled bills in the last 3 hours.' }}</p>
+    </div>
+  }
+</div>

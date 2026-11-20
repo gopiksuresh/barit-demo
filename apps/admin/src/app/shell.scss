@@ -1,0 +1,16 @@
+.container { height: 100vh; }
+.nav { width: 248px; display: flex; flex-direction: column; padding: 16px 8px; border-right: 1px solid var(--mat-sys-outline-variant); }
+.nav ::ng-deep .mat-drawer-inner-container { display: flex; flex-direction: column; }
+.brand { font-weight: 800; font-size: 1.25rem; padding: 4px 16px 12px; }
+.brand b { color: #c98a00; }
+.brand span { font-weight: 500; font-size: .85rem; color: var(--mat-sys-on-surface-variant); margin-left: 4px; }
+.venue { margin: 0 8px 12px; padding: 12px; border-radius: 12px; background: var(--mat-sys-secondary-container); }
+.vname { font-weight: 700; }
+.vrole { font-size: .8rem; opacity: .8; text-transform: capitalize; }
+.active { background: var(--mat-sys-secondary-container); border-radius: 999px; }
+.spacer { flex: 1; }
+.open-toggle { padding: 8px 16px 12px; }
+.logout { margin: 0 8px; justify-content: flex-start; }
+.content { padding: 24px; max-width: 1280px; margin: 0 auto; }
+.topbar { position: sticky; top: 0; z-index: 2; background: var(--mat-sys-surface-container); }
+@media (max-width: 599px) { .content { padding: 16px; } }

@@ -1,0 +1,7 @@
+<div class="fallback" [class.behind]="showImage() && loaded()" aria-hidden="true">
+  <span class="initials">{{ initials() }}</span>
+</div>
+@if (showImage()) {
+  <img [src]="src()" [alt]="name()" [attr.loading]="eager() ? 'eager' : 'lazy'" decoding="async"
+       [class.loaded]="loaded()" (load)="loaded.set(true)" (error)="failed.set(true)" />
+}

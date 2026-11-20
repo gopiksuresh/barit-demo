@@ -1,0 +1,22 @@
+@use 'mixins' as *;
+
+.narrow {
+  max-width: 440px;
+  margin: 0 auto;
+  padding-top: calc(var(--s-4) + env(safe-area-inset-top, 0px));
+  gap: var(--s-5);
+}
+.back { justify-self: start; }
+.intro { display: grid; gap: var(--s-2); }
+.badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+  margin-bottom: var(--s-2);
+}
+h1 { @include display(var(--fs-28)); }
+.card { padding: var(--s-5); }

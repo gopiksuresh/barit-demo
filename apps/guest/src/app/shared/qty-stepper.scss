@@ -1,0 +1,113 @@
+@use 'mixins' as *;
+
+:host { display: inline-flex; }
+
+// Shared pill shape for both states, so the morph doesn't jump in size.
+.add,
+.stepper {
+  height: 40px;
+  min-width: 96px;
+  border-radius: var(--radius-btn);
+  box-shadow: var(--highlight), 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.add {
+  @include bare-button;
+  @include pressable;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 var(--s-4);
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: var(--fs-14);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  &:hover { background: var(--surface-3); }
+  .plus { font-size: var(--fs-16); line-height: 1; }
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  overflow: hidden;
+}
+
+.step {
+  @include bare-button;
+  @include pressable;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  &:hover { background: rgba(0, 0, 0, 0.08); }
+  &:active { transform: scale(0.88); }
+}
+
+.count {
+  min-width: 18px;
+  text-align: center;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+// Round "+" used on special cards.
+.round-add {
+  @include bare-button;
+  @include pressable;
+  position: relative;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  box-shadow: var(--highlight), 0 6px 16px rgba(232, 164, 58, 0.25);
+  &:hover { background: var(--accent-strong); }
+}
+
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--text-primary);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  &.inline { position: static; }
+}
+
+// Compact variant (cart lines): smaller, no shadow.
+:host(.compact) .stepper {
+  height: 36px;
+  min-width: 100px;
+  box-shadow: var(--highlight);
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid rgba(232, 164, 58, 0.35);
+}
+:host(.compact) .step { width: 36px; height: 36px; }
+
+// Motion
+.morph-in { animation: morph-in var(--dur-slow) var(--ease-spring); }
+.bump-a { animation: bump-a 260ms var(--ease-spring); }
+.bump-b { animation: bump-b 260ms var(--ease-spring); }
+
+@keyframes morph-in { from { transform: scale(0.85); opacity: 0.4; } }
+// Two identical keyframes so alternating classes restarts the animation.
+@keyframes bump-a { 40% { transform: scale(1.35); } }
+@keyframes bump-b { 40% { transform: scale(1.35); } }

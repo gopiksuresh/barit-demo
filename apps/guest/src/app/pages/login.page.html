@@ -1,0 +1,9 @@
+<main class="page narrow">
+  <button type="button" class="icon-btn filled back" (click)="back()" aria-label="Back"><bg-icon name="back" /></button>
+  <div class="intro">
+    <span class="badge"><bg-icon name="sparkle" [size]="22" /></span>
+    <h1>Verify your phone</h1>
+    <p class="secondary">Your number identifies your orders at this table. We’ll send a one-time code — no password needed.</p>
+  </div>
+  <div class="card raised"><bg-phone-login (done)="continue()" /></div>
+</main>

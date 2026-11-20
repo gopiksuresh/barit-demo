@@ -1,0 +1,72 @@
+<h2 mat-dialog-title>{{ data.item ? 'Edit dish' : 'New dish' }}</h2>
+@if (busy()) { <mat-progress-bar mode="indeterminate" /> }
+<mat-dialog-content>
+  <form [formGroup]="form" class="grid">
+    <div class="photo">
+      <div class="preview" [style.background-image]="form.value.imageUrl ? 'url(' + form.value.imageUrl + ')' : null">
+        @if (!form.value.imageUrl) { <mat-icon>photo_camera</mat-icon> }
+      </div>
+      <div class="photo-actions">
+        <button mat-stroked-button type="button" (click)="file.click()" [disabled]="busy()">
+          <mat-icon>upload</mat-icon> {{ form.value.imageUrl ? 'Replace photo' : 'Upload photo' }}
+        </button>
+        @if (form.value.imageUrl) {
+          <button mat-button type="button" (click)="form.patchValue({ imageUrl: null })">Remove</button>
+        }
+        <input #file type="file" accept="image/jpeg,image/png,image/webp" hidden (change)="onFile($event)" />
+        <span class="hint">JPEG/PNG/WebP, up to 5 MB</span>
+      </div>
+    </div>
+
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Dish name</mat-label>
+      <input matInput formControlName="name" maxlength="80" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="2" maxlength="400"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Category</mat-label>
+      <mat-select formControlName="categoryId">
+        @for (c of data.categories; track c.id) { <mat-option [value]="c.id">{{ c.name }}</mat-option> }
+      </mat-select>
+    </mat-form-field>
+
+    <div class="toggles">
+      <mat-slide-toggle formControlName="isVeg">Vegetarian</mat-slide-toggle>
+      <mat-slide-toggle formControlName="isSpecial">Today’s special</mat-slide-toggle>
+      <mat-slide-toggle formControlName="isAvailable">Available</mat-slide-toggle>
+    </div>
+
+    <div class="full">
+      <h3>Portions &amp; prices <span class="hint">(ex-GST)</span></h3>
+      <div formArrayName="portions" class="portions">
+        @for (p of portions.controls; track p; let i = $index) {
+          <div [formGroupName]="i" class="portion">
+            <mat-form-field appearance="outline">
+              <mat-label>Label</mat-label>
+              <input matInput formControlName="label" placeholder="Half / Full / Glass" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Price</mat-label>
+              <span matTextPrefix>₹&nbsp;</span>
+              <input matInput type="number" min="0" step="1" formControlName="rupees" />
+            </mat-form-field>
+            <button mat-icon-button type="button" (click)="removePortion(i)" [disabled]="portions.length === 1" aria-label="Remove portion">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+      <button mat-button type="button" (click)="addPortion()" [disabled]="portions.length >= 10"><mat-icon>add</mat-icon> Add portion</button>
+    </div>
+  </form>
+  @if (error()) { <p class="error">{{ error() }}</p> }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-flat-button (click)="save()" [disabled]="busy() || form.invalid">Save</button>
+</mat-dialog-actions>

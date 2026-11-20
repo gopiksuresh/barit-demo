@@ -1,0 +1,219 @@
+@use 'mixins' as *;
+
+.page { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+.sk-page { padding-top: calc(var(--s-4) + env(safe-area-inset-top, 0px)); }
+.tnum { font-variant-numeric: tabular-nums; }
+.page > .section-label { margin-top: var(--s-3); }
+
+.state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  &.live { background: var(--success-soft); color: var(--success); }
+  &.paid { background: var(--accent-soft); color: var(--accent); }
+}
+.pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse { 50% { opacity: 0.25; } }
+
+.thanks {
+  @include surface(1);
+  display: grid;
+  justify-items: center;
+  gap: var(--s-2);
+  padding: var(--s-6) var(--s-4);
+  text-align: center;
+  h2 { @include display(var(--fs-22)); }
+}
+.thanks-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ── Orders ────────────────────────────────────────────────────────────── */
+.order { display: grid; gap: var(--s-3); }
+.order.cancelled { opacity: 0.55; }
+.order-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s-2); }
+.order-no { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.now-label {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent);
+  &[data-s='READY'] { background: var(--success-soft); color: var(--success); }
+  &[data-s='SERVED'] { background: var(--surface-2); color: var(--text-secondary); }
+}
+.o-lines { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; font-size: var(--fs-14); }
+.qty { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+.cancelled-tag { color: var(--danger); font-weight: 600; font-size: var(--fs-14); }
+
+// Status stepper (shared by order cards and the confirmation screen).
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  li { position: relative; display: grid; justify-items: center; gap: 6px; text-align: center; }
+  li:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    right: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--border-strong);
+    transition: background var(--dur-slow) var(--ease-out);
+  }
+  li.done:not(:first-child)::before { background: var(--accent); }
+  .dot {
+    position: relative;
+    z-index: 1;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    border: 2px solid var(--border-strong);
+    transition: background var(--dur-slow) var(--ease-out), border-color var(--dur-slow) var(--ease-out);
+  }
+  .done .dot { background: var(--accent); border-color: var(--accent); }
+  .now .dot { box-shadow: 0 0 0 5px var(--accent-soft); animation: glow 1.8s ease-in-out infinite; }
+  .lbl { font-size: 11px; color: var(--text-muted); }
+  .done .lbl { color: var(--text-secondary); }
+  .now .lbl { color: var(--accent); font-weight: 700; }
+  &.big .dot { width: 18px; height: 18px; }
+  &.big li:not(:first-child)::before { top: 8px; }
+  &.big .lbl { font-size: var(--fs-12); }
+}
+@keyframes glow { 50% { box-shadow: 0 0 0 8px rgba(232, 164, 58, 0.06); } }
+
+/* ── Bill ──────────────────────────────────────────────────────────────── */
+.receipt {
+  @include surface(1);
+  padding: var(--s-4);
+  display: grid;
+  gap: 6px;
+  hr { border: 0; border-top: 1px dashed var(--border-strong); margin: var(--s-2) 0; width: 100%; }
+}
+.r-row { display: flex; justify-content: space-between; gap: var(--s-3); font-size: var(--fs-14); }
+.r-row.sub { color: var(--text-secondary); font-size: var(--fs-12); }
+.total {
+  margin-top: var(--s-2);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-18);
+  font-weight: 700;
+  .tnum { color: var(--accent); }
+}
+.tip {
+  margin-top: var(--s-3);
+  padding: var(--s-3);
+  border-radius: var(--radius-btn);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.tip-chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-2); margin-top: var(--s-3); }
+.tip-chip {
+  @include bare-button;
+  @include pressable;
+  min-height: var(--tap);
+  padding: 0 var(--s-2);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-1);
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: var(--fs-14);
+  &.on { background: var(--accent); border-color: transparent; color: var(--text-on-accent); }
+}
+.custom-tip {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+  color: var(--text-secondary);
+  input { width: 140px; }
+}
+
+/* ── Order confirmation ────────────────────────────────────────────────── */
+.confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: var(--page-glow) no-repeat, rgba(14, 12, 10, 0.97);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: env(safe-area-inset-top, 0px) var(--gutter) env(safe-area-inset-bottom, 0px);
+  animation: fade-in var(--dur-slow) var(--ease-out);
+  overflow-y: auto;
+}
+.confirm-inner {
+  width: 100%;
+  max-width: 400px;
+  display: grid;
+  justify-items: center;
+  gap: var(--s-3);
+  text-align: center;
+  padding: var(--s-6) 0;
+  h2 { @include display(var(--fs-28)); }
+}
+.check {
+  width: 96px;
+  height: 96px;
+  margin-bottom: var(--s-2);
+  .ring {
+    fill: var(--accent-soft);
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-dasharray: 227;
+    stroke-dashoffset: 227;
+    animation: draw 600ms var(--ease-out) forwards;
+  }
+  .tick {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: draw 360ms var(--ease-out) 480ms forwards;
+  }
+}
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.confirm-card {
+  width: 100%;
+  @include surface(1);
+  padding: var(--s-4);
+  display: grid;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+  text-align: left;
+  .steps { margin-top: var(--s-2); }
+}
+.cc-row { display: flex; justify-content: space-between; align-items: center; }
+.confirm-actions { width: 100%; display: grid; gap: var(--s-2); margin-top: var(--s-3); }
+
+/* ── Stub payment sheet ────────────────────────────────────────────────── */
+.upi-body { padding: var(--s-2) var(--gutter) var(--s-5); display: grid; gap: var(--s-2); }
+.amount { @include display(2.25rem); text-align: center; margin: var(--s-4) 0 0; font-variant-numeric: tabular-nums; color: var(--accent); }
+.upi-id { text-align: center; color: var(--text-secondary); margin-bottom: var(--s-3); }

@@ -1,0 +1,135 @@
+@if (loading()) {
+  <!-- Skeleton mirrors the real layout so nothing jumps when data lands -->
+  <div class="sk-hero skeleton"></div>
+  <div class="page sk">
+    <div class="skeleton" style="height: 48px; border-radius: 14px"></div>
+    <div class="row start" style="gap: 8px">
+      @for (w of [88, 110, 76, 96]; track $index) { <div class="skeleton" [style.width.px]="w" style="height: 40px; border-radius: 999px"></div> }
+    </div>
+    <div class="row start" style="gap: 12px; overflow: hidden">
+      @for (i of [1, 2]; track i) { <div class="skeleton" style="flex: 0 0 240px; height: 270px"></div> }
+    </div>
+    @for (i of [1, 2, 3]; track i) { <div class="skeleton" style="height: 120px"></div> }
+  </div>
+} @else if (error()) {
+  <div class="page error-page">
+    <div class="error-card">{{ error() }}</div>
+    <a class="btn block" routerLink="/">Back to venues</a>
+  </div>
+} @else if (menu(); as m) {
+
+  <!-- ── Compact glass bar (shown once the hero scrolls away) ─────────────── -->
+  <header #compactBar class="compact-bar" [class.show]="compact()" [attr.aria-hidden]="!compact()" [attr.inert]="compact() ? null : ''">
+    <a routerLink="/" class="icon-btn" aria-label="All venues"><bg-icon name="back" /></a>
+    <span class="cb-name">{{ m.venue.name }}</span>
+    @if (table(); as t) {
+      <span class="table-pill small"><bg-icon name="table" [size]="14" /> T{{ t.table.number }}</span>
+    }
+    <button type="button" class="icon-btn" (click)="focusSearch()" aria-label="Search the menu"><bg-icon name="search" /></button>
+    @if (mySessionId(); as sid) {
+      <a class="icon-btn" [routerLink]="['/session', sid]" aria-label="Your orders and bill"><bg-icon name="receipt" /></a>
+    }
+  </header>
+
+  <!-- ── Hero (collapses into the glass bar via the sentinel) ─────────────── -->
+  <div class="hero-wrap">
+    <bg-venue-hero [venue]="m.venue" [image]="heroImage()" [tableNumber]="table()?.table?.number ?? null" [sessionId]="mySessionId()" />
+    <div #heroSentinel class="hero-sentinel" aria-hidden="true"></div>
+  </div>
+
+  @if (!table()) {
+    <div class="notice"><bg-icon name="table" [size]="18" /> Browsing only — scan the QR code on your table to order.</div>
+  } @else if (!m.venue.isOpen) {
+    <div class="notice warn">{{ m.venue.name }} isn’t taking orders right now.</div>
+  }
+
+  <!-- ── Search ───────────────────────────────────────────────────────────── -->
+  <div class="search-wrap">
+    <label class="search">
+      <bg-icon name="search" [size]="18" />
+      <span class="visually-hidden">Search the menu</span>
+      <input #search type="search" placeholder="Search appam, biryani…" autocomplete="off" enterkeyhint="search"
+             [value]="query()" (input)="onSearch($event)" />
+      @if (query()) {
+        <button type="button" class="clear" (click)="clearSearch()" aria-label="Clear search"><bg-icon name="close" [size]="16" /></button>
+      }
+    </label>
+  </div>
+
+  <!-- ── Sticky chips + quick filters ─────────────────────────────────────── -->
+  <nav #chipBar class="chip-bar" aria-label="Menu sections">
+    <div #chipRow class="chips">
+      @for (s of sections(); track s.id) {
+        <button type="button" class="nav-chip" [class.active]="activeSection() === s.id" [attr.data-chip]="s.id"
+                [attr.aria-current]="activeSection() === s.id ? 'true' : null" (click)="jump(s.id)">
+          @if (s.id === 'specials') { <bg-icon name="star" [size]="14" [filled]="true" /> }
+          {{ s.name }}
+        </button>
+      }
+    </div>
+  </nav>
+  <div class="filters" role="group" aria-label="Filters">
+    <button type="button" class="filter" [class.on]="vegOnly()" [attr.aria-pressed]="vegOnly()" (click)="vegOnly.set(!vegOnly())">
+      <span class="sq veg" aria-hidden="true"></span> Veg only
+    </button>
+    <button type="button" class="filter" [class.on]="specialsOnly()" [attr.aria-pressed]="specialsOnly()" (click)="specialsOnly.set(!specialsOnly())">
+      <bg-icon name="star" [size]="14" [filled]="true" /> Chef’s specials
+    </button>
+  </div>
+
+  <main class="menu">
+    <!-- ── Today's specials ───────────────────────────────────────────────── -->
+    @if (showSpecials()) {
+      <section id="sec-specials" #spy data-spy="specials" class="sec">
+        <div class="sec-head">
+          <h2 class="sec-title">Today’s specials</h2>
+          <span class="section-label">{{ specials().length }} dishes</span>
+        </div>
+        <div class="carousel">
+          @for (it of specials(); track it.id) {
+            <bg-special-card [item]="it" [qty]="qtyOf(it)" [canOrder]="ordering()"
+                             (open)="sheetItem.set(it)" (add)="quickAdd(it)" (remove)="decrement(it)" />
+          }
+        </div>
+      </section>
+    }
+
+    <!-- ── Categories ─────────────────────────────────────────────────────── -->
+    @for (c of filtered(); track c.id) {
+      <section [id]="'sec-' + c.id" #spy [attr.data-spy]="c.id" class="sec">
+        <div class="sec-head">
+          <h2 class="sec-title">{{ c.name }}</h2>
+          <span class="section-label">{{ c.items.length }} {{ c.items.length === 1 ? 'dish' : 'dishes' }}</span>
+        </div>
+        <ul class="items">
+          @for (it of c.items; track it.id) {
+            <li>
+              <bg-menu-item-row [item]="it" [qty]="qtyOf(it)" [canOrder]="ordering()"
+                                (open)="sheetItem.set(it)" (add)="quickAdd(it)" (remove)="decrement(it)" />
+            </li>
+          }
+        </ul>
+      </section>
+    } @empty {
+      <div class="empty">
+        <bg-icon name="search" [size]="28" />
+        <p>No dishes match{{ query() ? ' “' + query() + '”' : '' }}.</p>
+        <button type="button" class="btn small" (click)="query.set(''); vegOnly.set(false); specialsOnly.set(false)">Clear filters</button>
+      </div>
+    }
+
+    <p class="fine">Prices exclude GST. Liquor is outside GST and shown at 0% in this demo.</p>
+  </main>
+
+  <!-- ── Floating cart bar ────────────────────────────────────────────────── -->
+  @if (ordering() && cart.count() > 0) {
+    <bg-cart-bar [count]="cart.count()" [subtotalPaise]="cart.subtotalPaise()" animate.enter="cart-in" animate.leave="cart-out" />
+  }
+
+  <!-- ── Item sheet ───────────────────────────────────────────────────────── -->
+  @if (sheetItem(); as it) {
+    <bg-item-sheet [item]="it" [canOrder]="ordering()"
+                   [closeHint]="table() ? m.venue.name + ' isn’t taking orders right now.' : 'Scan the QR code on your table to order.'"
+                   (add)="addFromSheet(it, $event)" (closed)="sheetItem.set(null)" />
+  }
+}

@@ -1,0 +1,24 @@
+@if (qty() > 0 && !hasOptions()) {
+  <div class="stepper" role="group" [attr.aria-label]="itemName() + ' quantity'" animate.enter="morph-in">
+    <button type="button" class="step" (click)="dec($event)" [attr.aria-label]="'Remove one ' + itemName()">
+      <bg-icon name="minus" [size]="18" [stroke]="2.25" />
+    </button>
+    <span class="count" [class.bump-a]="bump() === 0" [class.bump-b]="bump() === 1" aria-live="polite">{{ qty() }}</span>
+    <button type="button" class="step" (click)="inc($event)" [attr.aria-label]="'Add one more ' + itemName()">
+      <bg-icon name="plus" [size]="18" [stroke]="2.25" />
+    </button>
+  </div>
+} @else if (variant() === 'round') {
+  <button type="button" class="round-add" (click)="inc($event)" [attr.aria-label]="(hasOptions() ? 'Choose options for ' : 'Add ') + itemName()">
+    <bg-icon name="plus" [size]="20" [stroke]="2.25" />
+    @if (qty() > 0) { <span class="badge" [class.bump-a]="bump() === 0" [class.bump-b]="bump() === 1">{{ qty() }}</span> }
+  </button>
+} @else {
+  <button type="button" class="add" (click)="inc($event)" [attr.aria-label]="(hasOptions() ? 'Choose options for ' : 'Add ') + itemName()">
+    {{ label() }}
+    @if (hasOptions()) {
+      @if (qty() > 0) { <span class="badge inline" [class.bump-a]="bump() === 0" [class.bump-b]="bump() === 1">{{ qty() }}</span> }
+      @else { <span class="plus" aria-hidden="true">+</span> }
+    }
+  </button>
+}

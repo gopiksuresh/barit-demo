@@ -1,0 +1,82 @@
+<header class="topbar">
+  @if (cart.table(); as t) {
+    <a [routerLink]="['/table', t.table.qrToken]" class="icon-btn" aria-label="Back to menu"><bg-icon name="back" /></a>
+    <div class="titles"><h1>Your order</h1><p>{{ t.venue.name }} · Table {{ t.table.number }}</p></div>
+  } @else {
+    <a routerLink="/" class="icon-btn" aria-label="Back"><bg-icon name="back" /></a>
+    <div class="titles"><h1>Your order</h1></div>
+  }
+</header>
+
+<main class="page">
+  @if (cart.lines().length === 0) {
+    <div class="empty">
+      <div class="empty-icon"><bg-icon name="bag" [size]="30" /></div>
+      <h2>Your cart is empty</h2>
+      <p class="secondary">Add a few dishes and they’ll show up here.</p>
+      @if (cart.table(); as t) { <a class="btn primary" [routerLink]="['/table', t.table.qrToken]">Browse the menu</a> }
+    </div>
+  } @else {
+    <section class="card lines">
+      <div class="lines-head">
+        <span class="section-label">{{ cart.count() }} {{ cart.count() === 1 ? 'item' : 'items' }}</span>
+        @if (cart.table(); as t) {
+          <a class="add-more" [routerLink]="['/table', t.table.qrToken]"><bg-icon name="plus" [size]="16" /> Add more</a>
+        }
+      </div>
+      @for (l of cart.lines(); track l.portionId) {
+        <bg-swipe-row (removed)="cart.remove(l.portionId)">
+          <div class="line">
+            <bg-dish-image class="line-thumb" [src]="l.imageUrl" [name]="l.itemName" ratio="1" />
+            <div class="line-text">
+              <div class="line-name"><bg-veg-mark [veg]="l.isVeg" /> <span>{{ l.itemName }}</span></div>
+              <div class="line-meta">{{ l.portionLabel }} · <span class="tnum">{{ l.pricePaise | inr }}</span></div>
+              @if (l.notes) { <div class="line-notes">“{{ l.notes }}”</div> }
+            </div>
+            <div class="line-side">
+              <bg-qty-stepper variant="compact" [qty]="l.qty" [itemName]="l.itemName"
+                              (increment)="cart.setQty(l.portionId, l.qty + 1)" (decrement)="cart.setQty(l.portionId, l.qty - 1)" />
+              <span class="line-amt">{{ l.qty * l.pricePaise | inr }}</span>
+            </div>
+          </div>
+        </bg-swipe-row>
+      }
+      <p class="swipe-hint">Swipe left on a dish to remove it</p>
+    </section>
+
+    <section class="card stack">
+      <label class="field">
+        <span>Cooking instructions <em>(optional)</em></span>
+        <textarea rows="2" maxlength="300" placeholder="Allergies, spice level, serve together…" [(ngModel)]="notes"></textarea>
+      </label>
+      <label class="field">
+        <span>Your name <em>(optional, so staff know whose order is whose)</em></span>
+        <input maxlength="60" placeholder="e.g. Asha" autocomplete="given-name" [(ngModel)]="guestName" />
+      </label>
+    </section>
+
+    <section class="receipt" aria-label="Bill summary">
+      <h2 class="section-label">Bill summary</h2>
+      <div class="r-row"><span>Item total</span><span class="tnum">{{ cart.subtotalPaise() | inr }}</span></div>
+      @if (cart.estTaxPaise() !== null) {
+        <div class="r-row muted-row"><span>Taxes (GST)</span><span class="tnum">{{ cart.estTaxPaise() | inr }}</span></div>
+        <div class="r-row total"><span>Total</span><span class="tnum">{{ estTotalPaise() | inr }}</span></div>
+      } @else {
+        <div class="r-row muted-row"><span>Taxes (GST)</span><span>added on your bill</span></div>
+      }
+      <p class="r-note">Tip and final taxes are confirmed on your table bill.</p>
+    </section>
+
+    @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+  }
+</main>
+
+@if (cart.lines().length) {
+  <div class="footer-bar">
+    <button type="button" class="btn primary block lg place" (click)="place()" [disabled]="busy()">
+      @if (busy()) { <span class="spinner" aria-hidden="true"></span> Sending to kitchen… }
+      @else if (auth.isLoggedIn()) { Place order · <span class="tnum">{{ estTotalPaise() | inr }}</span> }
+      @else { Verify phone &amp; place order }
+    </button>
+  </div>
+}

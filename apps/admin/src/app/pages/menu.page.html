@@ -1,0 +1,69 @@
+<div class="head">
+  <div>
+    <h1>Menu</h1>
+    <p class="sub">Changes go live on the guest menu immediately. Drag categories to reorder.</p>
+  </div>
+  <button mat-flat-button (click)="showNewCat.set(!showNewCat())"><mat-icon>add</mat-icon> Category</button>
+</div>
+
+@if (showNewCat()) {
+  <form class="new-cat" (ngSubmit)="addCategory()">
+    <mat-form-field appearance="outline"><mat-label>Category name</mat-label><input matInput name="n" [(ngModel)]="newCatName" required maxlength="60" /></mat-form-field>
+    <mat-form-field appearance="outline" class="gst"><mat-label>GST %</mat-label><input matInput type="number" name="g" [(ngModel)]="newCatGst" min="0" max="28" /></mat-form-field>
+    <button mat-flat-button [disabled]="!newCatName.trim()">Add</button>
+    <button mat-button type="button" (click)="showNewCat.set(false)">Cancel</button>
+  </form>
+}
+
+@if (loading()) { <mat-progress-bar mode="indeterminate" /> }
+
+<mat-accordion multi cdkDropList (cdkDropListDropped)="drop($event)">
+  @for (c of cats(); track c.id) {
+    <mat-expansion-panel cdkDrag [expanded]="$first">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <mat-icon cdkDragHandle class="handle" (click)="$event.stopPropagation()" matTooltip="Drag to reorder">drag_indicator</mat-icon>
+          {{ c.name }}
+        </mat-panel-title>
+        <mat-panel-description>{{ c.items.length }} items · GST {{ c.gstRatePct }}%</mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="items">
+        @for (it of c.items; track it.id) {
+          <div class="item" [class.off]="!it.isAvailable">
+            <div class="thumb" [style.background-image]="it.imageUrl ? 'url(' + it.imageUrl + ')' : null">
+              @if (!it.imageUrl) { <mat-icon>restaurant</mat-icon> }
+            </div>
+            <div class="info">
+              <div class="name">
+                <span class="veg" [class.nv]="!it.isVeg" [matTooltip]="it.isVeg ? 'Veg' : 'Non-veg'"></span>
+                {{ it.name }}
+              </div>
+              <div class="portions">
+                @for (p of it.portions; track p.id) { <span>{{ p.label }} <b>{{ p.pricePaise | inr }}</b></span> }
+              </div>
+            </div>
+            <div class="quick">
+              <mat-slide-toggle [checked]="it.isSpecial" (change)="quick(it, { isSpecial: $event.checked })">Special</mat-slide-toggle>
+              <mat-slide-toggle [checked]="it.isAvailable" (change)="quick(it, { isAvailable: $event.checked })">{{ it.isAvailable ? 'In stock' : 'Sold out' }}</mat-slide-toggle>
+            </div>
+            <div class="actions">
+              <button mat-icon-button (click)="editItem(c, it)" matTooltip="Edit"><mat-icon>edit</mat-icon></button>
+              <button mat-icon-button (click)="removeItem(c, it)" matTooltip="Delete"><mat-icon>delete_outline</mat-icon></button>
+            </div>
+          </div>
+        } @empty {
+          <p class="empty">No dishes in this category yet.</p>
+        }
+      </div>
+
+      <mat-action-row>
+        @if (staff.isOwner()) {
+          <button mat-button (click)="removeCategory(c)" [disabled]="c.items.length > 0" matTooltip="Only empty categories can be deleted">Delete category</button>
+        }
+        <button mat-button (click)="renameCategory(c)">Edit category</button>
+        <button mat-flat-button (click)="editItem(c, null)"><mat-icon>add</mat-icon> Dish</button>
+      </mat-action-row>
+    </mat-expansion-panel>
+  }
+</mat-accordion>

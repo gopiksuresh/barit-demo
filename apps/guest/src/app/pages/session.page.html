@@ -1,0 +1,149 @@
+@if (!s() && !error()) {
+  <div class="page sk-page">
+    <div class="skeleton" style="height: 56px; border-radius: 14px"></div>
+    <div class="skeleton" style="height: 180px"></div>
+    <div class="skeleton" style="height: 240px"></div>
+  </div>
+} @else if (!s()) {
+  <div class="page sk-page"><div class="error-card">{{ error() }}</div><a class="btn block" routerLink="/">Home</a></div>
+} @else if (s(); as s) {
+  <header class="topbar">
+    @if (tableQr(); as qr) {
+      <a class="icon-btn" [routerLink]="['/table', qr]" aria-label="Back to menu"><bg-icon name="back" /></a>
+    }
+    <div class="titles"><h1>Table {{ s.tableNumber }}</h1><p>{{ s.venue.name }}</p></div>
+    @if (s.status === 'CLOSED') { <span class="state-pill paid"><bg-icon name="check" [size]="14" [stroke]="2.5" /> Paid</span> }
+    @else { <span class="state-pill live"><span class="pulse"></span> Live</span> }
+  </header>
+
+  <main class="page">
+    @if (s.status === 'CLOSED') {
+      <section class="thanks">
+        <div class="thanks-icon"><bg-icon name="check" [size]="30" [stroke]="2.5" /></div>
+        <h2>Thank you!</h2>
+        <p class="secondary">Paid <span class="price">{{ s.payment?.totalPaise | inr }}</span> via {{ methodLabel(s.payment?.method) }}.</p>
+      </section>
+    }
+
+    <h2 class="section-label">Your orders</h2>
+    @for (o of s.orders; track o.id) {
+      <article class="card order" [class.cancelled]="o.status === 'CANCELLED'">
+        <div class="order-head">
+          <div>
+            <strong class="order-no">Order {{ orderNo(o) }}</strong>
+            <span class="muted small"> · {{ o.placedAt | date: 'shortTime' }}@if (o.guestName) { · {{ o.guestName }} }</span>
+          </div>
+          @if (o.status !== 'CANCELLED') { <span class="now-label" [attr.data-s]="o.status">{{ label(o.status) }}</span> }
+        </div>
+        <ul class="o-lines">
+          @for (it of o.items; track it.id) {
+            <li><span class="qty">{{ it.qty }}×</span> {{ it.itemName }} <span class="muted">· {{ it.portionLabel }}</span></li>
+          }
+        </ul>
+        @if (o.status === 'CANCELLED') {
+          <div class="cancelled-tag">Cancelled by the restaurant</div>
+        } @else {
+          <ol class="steps" [attr.aria-label]="'Status: ' + label(o.status)">
+            @for (st of steps; track st) {
+              <li [class.done]="reached(o.status, st)" [class.now]="o.status === st">
+                <span class="dot"></span><span class="lbl">{{ label(st) }}</span>
+              </li>
+            }
+          </ol>
+        }
+      </article>
+    }
+
+    @if (s.status !== 'CLOSED' && tableQr()) {
+      <a class="btn block" [routerLink]="['/table', tableQr()]"><bg-icon name="plus" [size]="18" /> Order more</a>
+    }
+
+    <h2 class="section-label">Bill</h2>
+    <section class="receipt">
+      @for (l of s.bill.lines; track $index) {
+        <div class="r-row"><span>{{ l.qty }} × {{ l.itemName }} <span class="muted small">{{ l.portionLabel }}</span></span><span class="tnum">{{ l.lineTotalPaise | inr }}</span></div>
+      }
+      <hr />
+      <div class="r-row"><span>Item total</span><span class="tnum">{{ s.bill.subtotalPaise | inr }}</span></div>
+      <div class="r-row sub"><span>CGST</span><span class="tnum">{{ s.bill.cgstPaise | inr }}</span></div>
+      <div class="r-row sub"><span>SGST</span><span class="tnum">{{ s.bill.sgstPaise | inr }}</span></div>
+      @if (s.status === 'CLOSED') {
+        @if (s.bill.tipPaise) { <div class="r-row"><span>Tip</span><span class="tnum">{{ s.bill.tipPaise | inr }}</span></div> }
+        <div class="r-row total"><span>Paid</span><span class="tnum">{{ s.bill.totalPaise | inr }}</span></div>
+      } @else {
+        <div class="tip">
+          <div class="r-row"><span>Add a tip for the staff</span><span class="tnum">{{ tipPaise() | inr }}</span></div>
+          <div class="tip-chips" role="radiogroup" aria-label="Tip">
+            @for (c of tipChoices; track c) {
+              <button type="button" class="tip-chip" role="radio" [attr.aria-checked]="tip() === c" [class.on]="tip() === c" (click)="tip.set(c)">
+                {{ c === 'custom' ? 'Custom' : c === 0 ? 'No tip' : c + '%' }}
+              </button>
+            }
+          </div>
+          @if (tip() === 'custom') {
+            <label class="custom-tip"><span>₹</span>
+              <input type="number" min="0" step="10" inputmode="numeric" aria-label="Custom tip in rupees"
+                     [value]="customRupees()" (input)="customRupees.set(+$any($event.target).value || 0)" />
+            </label>
+          }
+        </div>
+        <div class="r-row total"><span>To pay</span><span class="tnum">{{ grandTotal() | inr }}</span></div>
+      }
+    </section>
+
+    @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+  </main>
+
+  @if (s.status !== 'CLOSED') {
+    <div class="footer-bar">
+      <button type="button" class="btn primary block lg" (click)="pay()" [disabled]="paying() || !s.bill.lines.length">
+        {{ paying() ? 'Starting payment…' : 'Pay ' + (grandTotal() | inr) }}
+      </button>
+    </div>
+  }
+
+  <!-- ── Order confirmation (full screen, live) ──────────────────────────── -->
+  @if (showConfirm() && latestOrder(); as o) {
+    <section class="confirm" role="dialog" aria-modal="true" aria-labelledby="confirm-title" animate.leave="fade-out">
+      <div class="confirm-inner">
+        <svg class="check" viewBox="0 0 80 80" aria-hidden="true">
+          <circle class="ring" cx="40" cy="40" r="36" />
+          <path class="tick" d="M25 41.5l10 10L56 30" />
+        </svg>
+        <h2 id="confirm-title">Order placed</h2>
+        <p class="secondary">Sent straight to the kitchen at {{ s.venue.name }}.</p>
+        <div class="confirm-card">
+          <div class="cc-row"><span class="section-label">Order</span><strong class="order-no">{{ orderNo(o) }}</strong></div>
+          <div class="cc-row"><span class="section-label">Table</span><strong>{{ s.tableNumber }}</strong></div>
+          <ol class="steps big" aria-live="polite" [attr.aria-label]="'Status: ' + label(o.status)">
+            @for (st of steps; track st) {
+              <li [class.done]="reached(o.status, st)" [class.now]="o.status === st">
+                <span class="dot"></span><span class="lbl">{{ label(st) }}</span>
+              </li>
+            }
+          </ol>
+        </div>
+        <div class="confirm-actions">
+          <button type="button" class="btn primary block lg" (click)="dismissConfirm()">Track order &amp; bill</button>
+          @if (tableQr(); as qr) { <a class="btn ghost block" [routerLink]="['/table', qr]">Order more</a> }
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ── Test payment sheet (stub mode) ──────────────────────────────────── -->
+  @if (stub(); as co) {
+    <div class="scrim" animate.enter="fade-in" animate.leave="fade-out"></div>
+    <div class="sheet upi" role="dialog" aria-modal="true" aria-label="Test payment" animate.enter="sheet-in" animate.leave="sheet-out">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="upi-body">
+        <div class="row"><strong>Razorpay · Test mode</strong><span class="chip">STUB</span></div>
+        <p class="secondary small">No real money moves. This stands in for Razorpay checkout until test keys are configured.</p>
+        <div class="amount">{{ co.amountPaise | inr }}</div>
+        <div class="upi-id">UPI · success&#64;razorpay</div>
+        <button type="button" class="btn primary block lg" (click)="completeStub(co, true)" [disabled]="paying()">Pay with UPI (test)</button>
+        <button type="button" class="btn ghost block" (click)="completeStub(co, false)" [disabled]="paying()">Simulate failure</button>
+      </div>
+    </div>
+  }
+}

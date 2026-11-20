@@ -1,0 +1,25 @@
+node_modules/
+dist/
+.angular/
+coverage/
+*.log
+.firebase/
+firebase-debug*.log
+ui-debug.log
+
+# secrets / local config
+.env
+.env.*
+!.env.example
+apps/*/src/environments/environment.local.ts
+
+# local uploads (dev stand-in for Firebase Storage)
+api/uploads/
+api/src/generated/
+
+.DS_Store
+Thumbs.db
+
+# build output for Cloud Functions deploy
+.deploy/
+*.tsbuildinfo

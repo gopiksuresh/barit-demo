@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "demo-barit"
+  },
+  "targets": {
+    "demo-barit": {
+      "hosting": {
+        "guest": ["demo-barit-guest"],
+        "admin": ["demo-barit-admin"]
+      }
+    }
+  }
+}

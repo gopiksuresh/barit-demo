@@ -1,0 +1,40 @@
+<mat-sidenav-container class="container">
+  <mat-sidenav #nav [mode]="handset() ? 'over' : 'side'" [opened]="!handset()" class="nav">
+    <div class="brand">BAR<b>it</b> <span>Admin</span></div>
+    @if (staff.me(); as me) {
+      <div class="venue">
+        <div class="vname">{{ me.venue.name }}</div>
+        <div class="vrole">{{ me.name || me.phone }} · {{ me.role.toLowerCase() }}</div>
+      </div>
+    }
+    <mat-nav-list (click)="handset() && nav.close()">
+      @if (staff.canEditMenu()) {
+        <a mat-list-item routerLink="/orders" routerLinkActive="active"><mat-icon matListItemIcon>receipt_long</mat-icon>Live orders</a>
+      }
+      <a mat-list-item routerLink="/kds" routerLinkActive="active"><mat-icon matListItemIcon>soup_kitchen</mat-icon>Kitchen display</a>
+      @if (staff.canEditMenu()) {
+        <a mat-list-item routerLink="/menu" routerLinkActive="active"><mat-icon matListItemIcon>restaurant_menu</mat-icon>Menu</a>
+        <a mat-list-item routerLink="/tables" routerLinkActive="active"><mat-icon matListItemIcon>table_restaurant</mat-icon>Tables &amp; QR</a>
+      }
+    </mat-nav-list>
+    <div class="spacer"></div>
+    @if (staff.isOwner()) {
+      <div class="open-toggle">
+        <mat-slide-toggle [checked]="staff.me()?.venue?.isOpen" (change)="toggleOpen($event.checked)">
+          {{ staff.me()?.venue?.isOpen ? 'Taking orders' : 'Closed' }}
+        </mat-slide-toggle>
+      </div>
+    }
+    <button mat-button class="logout" (click)="logout()"><mat-icon>logout</mat-icon> Sign out</button>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    @if (handset()) {
+      <mat-toolbar class="topbar">
+        <button mat-icon-button (click)="nav.toggle()" aria-label="Menu"><mat-icon>menu</mat-icon></button>
+        <span>{{ staff.me()?.venue?.name }}</span>
+      </mat-toolbar>
+    }
+    <main class="content"><router-outlet /></main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

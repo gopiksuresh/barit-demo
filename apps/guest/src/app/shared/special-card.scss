@@ -1,0 +1,74 @@
+@use 'mixins' as *;
+
+:host {
+  position: relative;
+  flex: 0 0 240px; // leaves a visible peek of the next card on 360–430px screens
+  scroll-snap-align: start;
+  @include surface(1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--dur) var(--ease-out);
+  &:hover { border-color: var(--border-strong); }
+}
+
+.hit {
+  @include bare-button;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  &:focus-visible { outline-offset: -2px; }
+}
+
+.photo { position: relative; aspect-ratio: 4 / 3; overflow: hidden; pointer-events: none; }
+.photo bg-dish-image { position: absolute; inset: 0; border-radius: 0; }
+.fade { position: absolute; inset: 40% 0 0; background: linear-gradient(to bottom, transparent, var(--surface-1)); }
+.tag {
+  position: absolute;
+  top: var(--s-3);
+  left: var(--s-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  background: rgba(14, 12, 10, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(232, 164, 58, 0.4);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+}
+.mark { position: absolute; top: var(--s-3); right: var(--s-3); }
+
+.body {
+  position: relative;
+  padding: 0 var(--s-4) var(--s-4);
+  margin-top: -12px;
+  display: grid;
+  gap: 4px;
+  flex: 1;
+  pointer-events: none;
+}
+.name { font: 600 var(--fs-16) / 1.3 var(--font-ui); @include clamp(1); }
+.desc { color: var(--text-secondary); font-size: var(--fs-12); @include clamp(1); }
+.foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: var(--s-2); }
+.price { @include price; font-size: var(--fs-14); }
+.from { font-weight: 500; color: var(--text-muted); font-size: var(--fs-12); margin-right: 4px; }
+.control { position: relative; z-index: 1; pointer-events: auto; }
+
+// Subtle parallax as cards scroll horizontally (progressive enhancement).
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .parallax {
+      animation: parallax linear both;
+      animation-timeline: view(inline);
+    }
+    @keyframes parallax {
+      from { transform: scale(1.18) translateX(-6%); }
+      to { transform: scale(1.18) translateX(6%); }
+    }
+  }
+}

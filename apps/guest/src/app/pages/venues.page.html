@@ -1,0 +1,51 @@
+<header class="hero">
+  <div class="brand">BAR<span>it</span></div>
+  <h1>Eat, drink, order<br />from your table.</h1>
+  <span class="loc" title="The demo uses a fixed location"><bg-icon name="pin" [size]="14" /> Simulated location · {{ loc.label }}</span>
+</header>
+
+<main class="page">
+  <h2 class="section-label">Near you</h2>
+  @if (loading()) {
+    @for (i of [1, 2, 3]; track i) { <div class="skeleton" style="height: 104px"></div> }
+  } @else if (error()) {
+    <div class="error-card">{{ error() }} <button class="btn small" (click)="load()">Retry</button></div>
+  } @else {
+    <ul class="venues">
+      @for (v of venues(); track v.id) {
+        <li>
+          <a class="venue" [routerLink]="['/v', v.slug]">
+            <div class="venue-mark" [class.bar]="v.type === 'BAR'" aria-hidden="true">{{ v.name.charAt(0) }}</div>
+            <div class="venue-body">
+              <div class="row">
+                <h3>{{ v.name }}</h3>
+                <span class="dist">{{ v.distanceKm }} km</span>
+              </div>
+              <p class="addr">{{ v.address }}</p>
+              <div class="tags">
+                <span class="tag">{{ v.type === 'BAR' ? 'Bar & kitchen' : 'Restaurant' }}</span>
+                <span class="tag status" [class.closed]="!v.isOpen"><span class="dot"></span>{{ v.isOpen ? 'Open now' : 'Closed' }}</span>
+              </div>
+            </div>
+            <bg-icon class="chev" name="chevron" [size]="18" />
+          </a>
+        </li>
+      }
+    </ul>
+  }
+
+  <div class="hint">
+    <div class="hint-icon"><bg-icon name="table" [size]="22" /></div>
+    <div>
+      <strong>At a table?</strong>
+      <p class="secondary small">Scan the QR code on your table to see the live menu and order straight to the kitchen.</p>
+      @if (dev) {
+        <p class="small demo-links">
+          Demo tables:
+          <a routerLink="/table/kk-t3">Kayal Kitchen · T3</a>
+          <a routerLink="/table/tt-t2">Toddy &amp; Tide · T2</a>
+        </p>
+      }
+    </div>
+  </div>
+</main>

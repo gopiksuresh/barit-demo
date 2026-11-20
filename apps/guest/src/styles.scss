@@ -1,0 +1,207 @@
+@use 'tokens';
+@use 'mixins' as *;
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background: var(--page-glow) no-repeat, var(--bg);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font: 400 var(--fs-14) / 1.5 var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+img { max-width: 100%; display: block; }
+h1, h2, h3, h4 { margin: 0; font-weight: 600; }
+p { margin: 0; }
+a { color: var(--accent); }
+::selection { background: var(--accent-soft); color: var(--text-primary); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* App shell: phone-width column, centred on tablet/desktop. */
+.shell {
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+}
+@media (min-width: 520px) {
+  .shell { border-inline: 1px solid var(--border); background: var(--page-glow) no-repeat, var(--bg); }
+}
+
+.page { padding: var(--s-4) var(--gutter); display: grid; gap: var(--s-3); align-content: start; }
+
+/* ── Type helpers ───────────────────────────────────────────────────────── */
+.display { @include display(var(--fs-28)); }
+.section-label { @include section-label; }
+.muted { color: var(--text-muted); }
+.secondary { color: var(--text-secondary); }
+.small { font-size: var(--fs-12); }
+.price { @include price; }
+.center { text-align: center; }
+.error { color: var(--danger); font-weight: 500; }
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ── Surfaces ───────────────────────────────────────────────────────────── */
+.card { @include surface(1); padding: var(--s-4); }
+.card.raised { background: var(--surface-2); }
+.error-card {
+  @include surface(1);
+  padding: var(--s-4);
+  border-color: rgba(229, 103, 95, 0.3);
+  background: var(--danger-soft);
+  color: var(--text-primary);
+  display: flex; justify-content: space-between; align-items: center; gap: var(--s-3);
+}
+
+.row { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); }
+.row.start { justify-content: flex-start; }
+.stack { display: grid; gap: var(--s-3); }
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+  @include bare-button;
+  @include pressable;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  min-height: var(--tap);
+  padding: 0 var(--s-5);
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--highlight);
+}
+.btn:hover:not(:disabled) { background: var(--surface-3); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.primary { background: var(--accent); border-color: transparent; color: var(--text-on-accent); }
+.btn.primary:hover:not(:disabled) { background: var(--accent-strong); }
+.btn.ghost { background: transparent; border-color: transparent; box-shadow: none; color: var(--accent); }
+.btn.block { width: 100%; }
+.btn.lg { min-height: 54px; font-size: var(--fs-16); }
+.btn.small { min-height: 36px; padding: 0 var(--s-3); font-size: var(--fs-12); border-radius: 10px; }
+
+.icon-btn {
+  @include bare-button;
+  @include pressable;
+  width: var(--tap); height: var(--tap);
+  display: inline-grid; place-items: center;
+  border-radius: var(--radius-pill);
+  color: var(--text-primary);
+}
+.icon-btn.filled { background: var(--surface-2); border: 1px solid var(--border); box-shadow: var(--highlight); }
+
+.chip {
+  display: inline-flex; align-items: center; gap: var(--s-1);
+  padding: 4px 10px; border-radius: var(--radius-pill);
+  border: 1px solid var(--border); background: var(--surface-1);
+  font-size: var(--fs-12); font-weight: 600; color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* ── Forms ──────────────────────────────────────────────────────────────── */
+.field { display: grid; gap: var(--s-2); font-size: var(--fs-12); font-weight: 600; color: var(--text-secondary); }
+.field em { font-weight: 400; font-style: normal; color: var(--text-muted); }
+input, textarea {
+  font: 500 var(--fs-16) / 1.4 var(--font-ui); /* 16px avoids iOS zoom-on-focus */
+  color: var(--text-primary);
+  padding: 12px 14px;
+  min-height: var(--tap);
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  box-shadow: var(--highlight);
+  width: 100%;
+  transition: border-color var(--dur) var(--ease-out);
+}
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
+input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+textarea { resize: vertical; }
+
+/* ── Skeletons (warm shimmer) ───────────────────────────────────────────── */
+.skeleton {
+  border-radius: var(--radius-card);
+  background: linear-gradient(100deg, var(--surface-1) 30%, var(--surface-2) 50%, var(--surface-1) 70%);
+  background-size: 300% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+/* ── Sheets & scrims (shared by item sheet, payment sheet) ──────────────── */
+.scrim {
+  position: fixed; inset: 0; z-index: 40;
+  background: var(--scrim);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 41;
+  max-width: var(--shell-max); margin: 0 auto;
+  max-height: 92dvh;
+  display: flex; flex-direction: column;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong); border-bottom: 0;
+  border-radius: 24px 24px 0 0;
+  box-shadow: var(--highlight);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  overscroll-behavior: contain;
+}
+.sheet-handle {
+  width: 40px; height: 4px; border-radius: 4px;
+  background: var(--border-strong); margin: 10px auto 6px; flex: none;
+}
+
+/* Enter/leave animation classes (used with Angular's animate.enter / animate.leave). */
+.fade-in { animation: fade-in var(--dur) var(--ease-out); }
+.fade-out { animation: fade-in var(--dur-fast) var(--ease-out) reverse forwards; }
+.sheet-in { animation: sheet-in 320ms var(--ease-spring); }
+.sheet-out { animation: sheet-out var(--dur) var(--ease-out) forwards; }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes sheet-in { from { transform: translateY(100%); } }
+@keyframes sheet-out { to { transform: translateY(100%); } }
+
+/* Sticky bottom action area (cart, checkout). */
+.footer-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  max-width: var(--shell-max); margin: 0 auto;
+  padding: var(--s-3) var(--gutter) calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to top, var(--bg) 65%, transparent);
+}
+
+/* Sub-page top bar (cart, session). */
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; gap: var(--s-2);
+  min-height: calc(var(--bar-h) + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) var(--s-3) 0;
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border-bottom: 1px solid var(--border);
+}
+.topbar .titles { flex: 1; min-width: 0; }
+.topbar h1 { font: 600 var(--fs-16) / 1.2 var(--font-ui); }
+.topbar p { font-size: var(--fs-12); color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

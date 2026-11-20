@@ -1,0 +1,25 @@
+<div class="media" aria-hidden="true">
+  @if (image(); as img) { <bg-dish-image [src]="img" [name]="venue().name" ratio="auto" [eager]="true" /> }
+  <div class="shade"></div>
+</div>
+
+<div class="top">
+  <a routerLink="/" class="icon-btn glass" aria-label="All venues"><bg-icon name="back" /></a>
+  @if (sessionId(); as sid) {
+    <a class="glass-pill" [routerLink]="['/session', sid]"><bg-icon name="receipt" [size]="16" /> Request bill</a>
+  }
+</div>
+
+<div class="body">
+  @if (tableNumber(); as n) {
+    <span class="table-pill"><bg-icon name="table" [size]="16" /> Table {{ n }}</span>
+  }
+  <h1 class="name">{{ venue().name }}</h1>
+  <p class="addr"><bg-icon name="pin" [size]="14" /> {{ venue().address }}</p>
+  <div class="meta">
+    <span class="pill status" [class.closed]="!venue().isOpen">
+      <span class="dot"></span>{{ venue().isOpen ? 'Open now' : 'Closed now' }}
+    </span>
+    <span class="pill">{{ venue().type === 'BAR' ? 'Bar & kitchen' : 'Restaurant' }}</span>
+  </div>
+</div>

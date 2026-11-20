@@ -1,0 +1,7 @@
+<a class="bar" routerLink="/cart">
+  <span class="left">
+    <span class="count" [class.bump-a]="bump() === 0" [class.bump-b]="bump() === 1">{{ count() }}</span>
+    {{ count() === 1 ? 'item' : 'items' }} · <span class="tnum">{{ subtotalPaise() | inr: 'short' }}</span>
+  </span>
+  <span class="right">View cart <bg-icon name="chevron" [size]="18" [stroke]="2.25" /></span>
+</a>

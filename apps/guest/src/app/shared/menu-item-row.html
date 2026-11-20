@@ -1,0 +1,22 @@
+<button type="button" class="hit" (click)="open.emit()" [attr.aria-label]="'View ' + item().name"></button>
+<div class="text">
+  <div class="marks">
+    <bg-veg-mark [veg]="item().isVeg" />
+    @if (item().isSpecial) { <span class="mini-tag star"><bg-icon name="star" [size]="11" [filled]="true" /> Special</span> }
+  </div>
+  <h3 class="name">{{ item().name }}</h3>
+  <div class="price">
+    @if (hasOptions()) { <span class="from">from</span> }{{ minPrice() | inr: 'short' }}
+  </div>
+  @if (item().description) { <p class="desc">{{ item().description }}</p> }
+  @if (hasOptions()) {
+    <div class="tags"><span class="mini-tag">{{ item().portions.length }} options</span></div>
+  }
+</div>
+<div class="side">
+  <bg-dish-image class="thumb" [src]="item().imageUrl" [name]="item().name" ratio="1" />
+  @if (canOrder()) {
+    <bg-qty-stepper class="control" [qty]="qty()" [itemName]="item().name" [hasOptions]="hasOptions()"
+                    (increment)="add.emit()" (decrement)="remove.emit()" />
+  }
+</div>

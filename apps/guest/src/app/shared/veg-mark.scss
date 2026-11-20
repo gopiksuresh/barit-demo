@@ -1,0 +1,30 @@
+// Standard Indian food mark (square + dot / triangle), restyled for the dark theme:
+// slightly rounded, with a faint tinted fill so it reads on photos and dark cards alike.
+:host { display: inline-flex; flex: none; }
+
+.mark {
+  --c: var(--nonveg);
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--c);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--c) 12%, rgba(14, 12, 10, 0.55));
+}
+.mark.veg { --c: var(--veg); }
+
+.dot {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 7px solid var(--c);
+}
+.veg .dot {
+  width: 7px;
+  height: 7px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--c);
+}

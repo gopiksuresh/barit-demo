@@ -1,0 +1,35 @@
+@if (step() === 'phone') {
+  <form (ngSubmit)="send()" class="stack">
+    <label class="field">
+      <span>Mobile number</span>
+      <div class="phone">
+        <span class="cc">+91</span>
+        <input name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10"
+               placeholder="98765 43210" [ngModel]="phone()" (ngModelChange)="phone.set($event)" required autofocus />
+      </div>
+    </label>
+    <button class="btn primary block" [disabled]="busy() || !validPhone()">
+      {{ busy() ? 'Sending…' : 'Send OTP' }}
+    </button>
+  </form>
+} @else {
+  <form (ngSubmit)="verify()" class="stack">
+    <p class="muted">Enter the 6-digit code sent to <strong>+91 {{ phone() }}</strong>
+      <button type="button" class="link" (click)="reset()">Change</button></p>
+    <label class="field">
+      <span>OTP</span>
+      <input name="code" class="otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6"
+             placeholder="••••••" [ngModel]="code()" (ngModelChange)="code.set($event)" required autofocus />
+    </label>
+    <button class="btn primary block" [disabled]="busy() || code().length !== 6">
+      {{ busy() ? 'Verifying…' : 'Verify & continue' }}
+    </button>
+    @if (dev) {
+      <button type="button" class="btn ghost block small" (click)="fillFromEmulator()">
+        Dev: fill code from Auth emulator
+      </button>
+    }
+  </form>
+}
+@if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+<div #recaptcha></div>

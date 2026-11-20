@@ -1,0 +1,75 @@
+<div class="scrim" [class.out]="closing()" (click)="close()"></div>
+
+<section #panel class="sheet panel" role="dialog" aria-modal="true" [attr.aria-labelledby]="titleId" tabindex="-1"
+         [class.out]="closing()" [class.dragging]="dragging()"
+         [style.transform]="dragY() && !closing() ? 'translateY(' + dragY() + 'px)' : null">
+
+  <!-- Drag zone: handle + photo -->
+  <div class="grab" (pointerdown)="onDown($event)" (pointermove)="onMove($event)"
+       (pointerup)="onUp()" (pointercancel)="onUp()">
+    <div class="sheet-handle" aria-hidden="true"></div>
+  </div>
+
+  <div #body class="body">
+    <div class="photo" (pointerdown)="onDown($event)" (pointermove)="onMove($event)" (pointerup)="onUp()" (pointercancel)="onUp()">
+      <bg-dish-image [src]="item().imageUrl" [name]="item().name" ratio="16 / 10" [eager]="true" />
+      <div class="photo-fade" aria-hidden="true"></div>
+      <button type="button" class="close icon-btn" (click)="close()" aria-label="Close">
+        <bg-icon name="close" [size]="20" />
+      </button>
+    </div>
+
+    <div class="content">
+      <div class="tags">
+        <bg-veg-mark [veg]="item().isVeg" />
+        <span class="veg-label">{{ item().isVeg ? 'Vegetarian' : 'Non-vegetarian' }}</span>
+        @if (item().isSpecial) { <span class="tag star"><bg-icon name="star" [size]="12" [filled]="true" /> Chef’s special</span> }
+      </div>
+      <h2 [id]="titleId" class="name">{{ item().name }}</h2>
+      @if (item().description) { <p class="desc">{{ item().description }}</p> }
+
+      @if (item().portions.length > 1) {
+        <fieldset class="options">
+          <legend class="section-label">Choose a portion</legend>
+          @for (p of item().portions; track p.id) {
+            <label class="option" [class.on]="selected()?.id === p.id">
+              <input type="radio" name="portion" [value]="p.id" [checked]="selected()?.id === p.id"
+                     (change)="selectedId.set(p.id)" [disabled]="!canOrder()" />
+              <span class="radio" aria-hidden="true"></span>
+              <span class="opt-label">{{ p.label }}</span>
+              <span class="price">{{ p.pricePaise | inr: 'short' }}</span>
+            </label>
+          }
+        </fieldset>
+      } @else if (selected(); as p) {
+        <div class="single row"><span class="secondary">{{ p.label }}</span><span class="price">{{ p.pricePaise | inr: 'short' }}</span></div>
+      }
+
+      @if (canOrder()) {
+        <label class="field instructions">
+          <span>Special instructions <em>(optional)</em></span>
+          <textarea rows="2" maxlength="200" placeholder="Less spicy, no onion, extra gravy…" [(ngModel)]="notes"></textarea>
+        </label>
+      }
+    </div>
+  </div>
+
+  <footer class="actions">
+    @if (canOrder()) {
+      <div class="qty" role="group" aria-label="Quantity">
+        <button type="button" (click)="setQty(qty() - 1)" [disabled]="qty() <= 1" aria-label="Decrease quantity">
+          <bg-icon name="minus" [size]="18" [stroke]="2.25" />
+        </button>
+        <span aria-live="polite">{{ qty() }}</span>
+        <button type="button" (click)="setQty(qty() + 1)" [disabled]="qty() >= 50" aria-label="Increase quantity">
+          <bg-icon name="plus" [size]="18" [stroke]="2.25" />
+        </button>
+      </div>
+      <button type="button" class="btn primary lg add" (click)="confirm()">
+        Add item · <span class="tnum">{{ totalPaise() | inr: 'short' }}</span>
+      </button>
+    } @else {
+      <p class="browse-note"><bg-icon name="table" [size]="18" /> {{ closeHint() }}</p>
+    }
+  </footer>
+</section>

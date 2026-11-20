@@ -1,0 +1,8 @@
+<div class="action" [class.armed]="dx() <= -96" aria-hidden="true">
+  <bg-icon name="trash" [size]="18" /> {{ label() }}
+</div>
+<div class="content" [class.dragging]="dragging()"
+     [style.transform]="leaving() ? 'translateX(-100%)' : dx() ? 'translateX(' + dx() + 'px)' : null"
+     (pointerdown)="onDown($event)" (pointermove)="onMove($event)" (pointerup)="onUp()" (pointercancel)="onUp()">
+  <ng-content />
+</div>

@@ -1,0 +1,35 @@
+{
+  "name": "barit",
+  "private": true,
+  "workspaces": [
+    "packages/shared",
+    "api",
+    "apps/guest",
+    "apps/admin"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n auth,api,guest,admin -c magenta,blue,green,yellow \"npm:emulators:auth\" \"npm:dev:api\" \"npm:dev:guest\" \"npm:dev:admin\"",
+    "emulators": "npm run build:emulator && firebase emulators:start --only auth,functions,hosting --project demo-barit",
+    "emulators:auth": "firebase emulators:start --only auth --project demo-barit",
+    "dev:api": "npm run start:dev -w api",
+    "dev:guest": "npm start -w apps/guest",
+    "dev:admin": "npm start -w apps/admin",
+    "build:shared": "npm run build -w packages/shared",
+    "db:migrate": "npm run db:migrate -w api",
+    "db:seed": "npm run db:seed -w api",
+    "db:reset": "npm run db:reset -w api",
+    "test": "npm test -w api",
+    "test:e2e": "npm run test:e2e -w api",
+    "build": "npm run build:shared && npm run build:functions && npm run build -w apps/guest && npm run build -w apps/admin",
+    "build:emulator": "npm run build:shared && node scripts/build-functions.mjs --install && npm run build -w apps/guest -- -c emulator && npm run build -w apps/admin -- -c emulator",
+    "build:functions": "node scripts/build-functions.mjs --install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "firebase-tools": "15.37.0",
+    "esbuild": "0.28.2"
+  }
+}

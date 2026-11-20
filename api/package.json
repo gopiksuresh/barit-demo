@@ -1,0 +1,56 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/function.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "prebuild": "prisma generate",
+    "build": "nest build",
+    "start:dev": "prisma generate && nest start --watch",
+    "start": "node dist/main.js",
+    "db:migrate": "prisma migrate dev && prisma generate",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma migrate reset --force && prisma generate && prisma db seed",
+    "test": "jest --config jest.config.js",
+    "test:e2e": "jest --config jest.e2e.config.js --runInBand"
+  },
+  "dependencies": {
+    "@barit/shared": "*",
+    "@nestjs/common": "^11.1.0",
+    "@nestjs/core": "^11.1.0",
+    "@nestjs/platform-express": "^11.1.0",
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "firebase-admin": "14.5.1",
+    "firebase-functions": "7.4.0",
+    "pg": "^8.16.0",
+    "qrcode": "1.5.4",
+    "razorpay": "2.9.8",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/testing": "^11.1.0",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^22.15.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.0.0",
+    "prisma": "7.10.1",
+    "supertest": "^7.1.0",
+    "ts-jest": "^29.4.0",
+    "tsx": "^4.20.0",
+    "typescript": "~5.9.3"
+  }
+}

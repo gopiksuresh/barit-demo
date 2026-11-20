@@ -1,0 +1,30 @@
+.head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+h1 { margin: 0; }
+.sub { margin: 4px 0 0; color: var(--mat-sys-on-surface-variant); }
+.error { color: var(--mat-sys-error); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; align-items: start; }
+.sess { padding: 16px; display: grid; gap: 10px; }
+.sess.paying { border-color: #e0a100; }
+.top { display: flex; align-items: center; gap: 12px; }
+.tno { font-size: 1.4rem; font-weight: 800; width: 52px; height: 52px; border-radius: 12px; display: grid; place-items: center; background: var(--mat-sys-primary-container); color: var(--mat-sys-on-primary-container); }
+.closed .tno { background: var(--mat-sys-surface-container-high); color: var(--mat-sys-on-surface-variant); }
+.grow { flex: 1; }
+.status { font-weight: 700; }
+.since { font-size: .8rem; color: var(--mat-sys-on-surface-variant); }
+.total { font-weight: 800; font-size: 1.1rem; }
+.order { border-top: 1px dashed var(--mat-sys-outline-variant); padding-top: 8px; }
+.orow { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.who { font-size: .8rem; color: var(--mat-sys-on-surface-variant); }
+ul { margin: 6px 0 0; padding-left: 18px; font-size: .92rem; }
+.muted { color: var(--mat-sys-on-surface-variant); font-size: .85em; }
+.note { font-size: .85rem; font-style: italic; margin-top: 4px; color: #8a5a12; }
+.pill { font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--mat-sys-surface-container-high); }
+.pill[data-s='ORDERED'] { background: #e3ecff; color: #1d4ed8; }
+.pill[data-s='COOKING'] { background: #fff1d6; color: #9a5d00; }
+.pill[data-s='READY'] { background: #dcfce7; color: #166534; }
+.pill[data-s='SERVED'] { background: var(--mat-sys-surface-container-high); color: var(--mat-sys-on-surface-variant); }
+.pill[data-s='CANCELLED'] { background: #fde2e1; color: #b3261e; }
+.foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-top: 1px solid var(--mat-sys-outline-variant); padding-top: 10px; flex-wrap: wrap; }
+.foot.paid { justify-content: flex-start; color: #166534; font-weight: 600; }
+.empty { grid-column: 1 / -1; text-align: center; color: var(--mat-sys-on-surface-variant); padding: 48px 16px; }
+.empty mat-icon { font-size: 48px; width: 48px; height: 48px; }

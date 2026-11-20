@@ -1,0 +1,39 @@
+@use 'mixins' as *;
+
+.phone {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  background: var(--surface-1);
+  box-shadow: var(--highlight);
+  overflow: hidden;
+  transition: border-color var(--dur) var(--ease-out);
+  &:focus-within { border-color: var(--accent); }
+  input { border: 0; box-shadow: none; background: transparent; flex: 1; min-width: 0; }
+  input:focus { border: 0; }
+}
+.cc {
+  padding: 0 var(--s-3);
+  display: grid;
+  place-items: center;
+  border-right: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.otp {
+  letter-spacing: 0.5em;
+  font-size: var(--fs-22);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  background: var(--surface-1);
+}
+.link {
+  @include bare-button;
+  color: var(--accent);
+  font-weight: 600;
+  padding: 0 4px;
+  min-height: 32px;
+}
+.error { margin-top: var(--s-3); }

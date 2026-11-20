@@ -1,0 +1,23 @@
+<div class="wrap">
+  <mat-card appearance="outlined" class="login">
+    <mat-card-header>
+      <mat-card-title><span class="brand">BAR<b>it</b></span> Venue Admin</mat-card-title>
+      <mat-card-subtitle>Sign in with your registered mobile number</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @if (staff.notStaff()) {
+        <p class="warn">That number isn’t registered as staff for any venue. Ask the venue owner to add you.</p>
+      }
+      <ba-phone-login (done)="signedIn()" />
+      @if (dev) {
+        <div class="demo">
+          <strong>Demo logins</strong>
+          <div><code>9999900001</code> · Kayal Kitchen owner</div>
+          <div><code>9999900002</code> · Toddy &amp; Tide owner</div>
+          <div><code>9999900003</code> · Kayal Kitchen kitchen (KDS)</div>
+          <div class="hint">OTP: tap “Dev: fill code from Auth emulator”</div>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,88 @@
+@use 'mixins' as *;
+
+:host {
+  position: relative;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(var(--s-3) + env(safe-area-inset-top, 0px)) var(--gutter) var(--s-6);
+  overflow: hidden;
+  // Without a photo: lamplit teak + banana-leaf green, never flat.
+  background:
+    radial-gradient(90% 70% at 85% 0%, rgba(232, 164, 58, 0.28), transparent 60%),
+    radial-gradient(70% 60% at 0% 100%, rgba(46, 84, 50, 0.45), transparent 70%),
+    linear-gradient(160deg, #2a1d12, #120e0a 70%);
+}
+:host(.has-photo) { min-height: 300px; }
+
+.media {
+  position: absolute;
+  inset: 0;
+  bg-dish-image { position: absolute; inset: 0; border-radius: 0; }
+}
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(14, 12, 10, 0.55) 0%, rgba(14, 12, 10, 0.15) 35%, rgba(14, 12, 10, 0.92) 85%, var(--bg) 100%);
+}
+
+.top, .body { position: relative; z-index: 1; }
+.top { display: flex; justify-content: space-between; align-items: center; }
+.glass,
+.glass-pill {
+  background: rgba(14, 12, 10, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-strong);
+}
+.glass-pill {
+  @include pressable;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap);
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: var(--fs-12);
+  text-decoration: none;
+}
+
+.body { display: grid; gap: var(--s-2); justify-items: start; margin-top: var(--s-8); }
+.name { @include display(var(--fs-28)); text-wrap: balance; }
+.addr { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: var(--fs-14); }
+.meta { display: flex; gap: var(--s-2); flex-wrap: wrap; margin-top: var(--s-1); }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-12);
+  font-weight: 600;
+  background: rgba(14, 12, 10, 0.55);
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+}
+.status {
+  color: var(--success);
+  &.closed { color: var(--danger); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+}
+
+// Glowing brass table pill.
+.table-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, #f0b450, var(--accent));
+  color: var(--text-on-accent);
+  font-weight: 700;
+  font-size: var(--fs-12);
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 0 1px rgba(255, 220, 160, 0.35) inset, 0 0 18px var(--accent-glow);
+}

@@ -1,0 +1,12 @@
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; padding-top: 8px; }
+.full, .photo { grid-column: 1 / -1; }
+.photo { display: flex; gap: 16px; align-items: center; margin-bottom: 12px; }
+.preview { width: 120px; height: 96px; border-radius: 12px; background: var(--mat-sys-surface-container) center/cover; display: grid; place-items: center; color: var(--mat-sys-outline); flex: none; }
+.photo-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.hint { font-size: .8rem; color: var(--mat-sys-on-surface-variant); font-weight: 400; width: 100%; }
+h3 .hint { width: auto; }
+.toggles { display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+h3 { margin: 8px 0; font-size: 1rem; }
+.portion { display: grid; grid-template-columns: 1fr 140px 40px; gap: 8px; align-items: start; }
+.error { color: var(--mat-sys-error); }
+@media (max-width: 599px) { .grid { grid-template-columns: 1fr; } .photo { flex-direction: column; align-items: flex-start; } }

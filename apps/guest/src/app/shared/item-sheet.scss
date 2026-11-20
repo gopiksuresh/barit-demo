@@ -1,0 +1,161 @@
+@use 'mixins' as *;
+
+.scrim {
+  touch-action: none;
+  animation: fade-in var(--dur) var(--ease-out);
+  &.out { animation: fade-out var(--dur) var(--ease-out) forwards; }
+}
+
+.panel {
+  outline: none;
+  animation: sheet-in 340ms var(--ease-spring);
+  transition: transform var(--dur) var(--ease-out);
+  &.dragging { transition: none; }
+  &.out { animation: sheet-out var(--dur) var(--ease-out) forwards; }
+}
+
+.grab {
+  flex: none;
+  touch-action: none;
+  cursor: grab;
+  padding-bottom: 4px;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.photo {
+  position: relative;
+  margin: 0 var(--s-4);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  touch-action: none;
+  border: 1px solid var(--border);
+}
+.photo-fade {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(14, 12, 10, 0.55), transparent);
+  pointer-events: none;
+}
+.close {
+  position: absolute;
+  top: var(--s-2);
+  right: var(--s-2);
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-strong);
+}
+
+.content {
+  padding: var(--s-4) var(--gutter) var(--s-5);
+  display: grid;
+  gap: var(--s-3);
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+}
+.veg-label { font-size: var(--fs-12); color: var(--text-secondary); }
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-12);
+  font-weight: 600;
+}
+.tag.star { background: var(--accent-soft); color: var(--accent); }
+
+.name { @include display(var(--fs-22)); }
+.desc { color: var(--text-secondary); font-size: var(--fs-14); line-height: 1.6; }
+
+.options {
+  border: 0;
+  padding: 0;
+  margin: var(--s-2) 0 0;
+  display: grid;
+  gap: var(--s-2);
+  legend { margin-bottom: var(--s-2); padding: 0; }
+}
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 52px;
+  padding: 0 var(--s-4);
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease-out), background var(--dur) var(--ease-out);
+
+  input { position: absolute; opacity: 0; pointer-events: none; }
+  &:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+  &.on { border-color: var(--accent); background: var(--accent-soft); }
+}
+.radio {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+  flex: none;
+  .on & { border-color: var(--accent); }
+  .on &::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+}
+.opt-label { flex: 1; font-weight: 600; }
+.price { @include price; }
+.single { padding: var(--s-3) 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.instructions { margin-top: var(--s-2); }
+
+.actions {
+  flex: none;
+  display: flex;
+  gap: var(--s-3);
+  align-items: center;
+  padding: var(--s-3) var(--gutter) var(--s-4);
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.qty {
+  display: flex;
+  align-items: center;
+  height: 54px;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-1);
+  button {
+    @include bare-button;
+    @include pressable;
+    width: var(--tap);
+    height: 100%;
+    display: grid;
+    place-items: center;
+    color: var(--accent);
+    &:disabled { color: var(--text-muted); cursor: not-allowed; }
+  }
+  span { min-width: 24px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+}
+.add { flex: 1; }
+.tnum { font-variant-numeric: tabular-nums; }
+.browse-note {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--text-secondary);
+  font-size: var(--fs-14);
+  min-height: var(--tap);
+}

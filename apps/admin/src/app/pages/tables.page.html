@@ -1,0 +1,51 @@
+<div class="head">
+  <div>
+    <h1>Tables &amp; QR codes</h1>
+    <p class="sub">Each table’s QR opens the guest menu in ordering mode for that table.</p>
+  </div>
+  @if (staff.isOwner()) {
+    <form class="add" (ngSubmit)="add()">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Table #</mat-label><input matInput type="number" name="n" [(ngModel)]="newNumber" min="1" /></mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Seats</mat-label><input matInput type="number" name="s" [(ngModel)]="newSeats" min="1" /></mat-form-field>
+      <button mat-flat-button [disabled]="!newNumber"><mat-icon>add</mat-icon> Table</button>
+    </form>
+  }
+</div>
+
+<div class="grid">
+  @for (t of tables(); track t.id) {
+    <mat-card appearance="outlined" class="table" [class.busy]="t.occupied">
+      <div class="num">{{ t.number }}</div>
+      <div class="meta">
+        <div>{{ t.seats }} seats</div>
+        <div class="state">{{ t.occupied ? 'Occupied' : 'Free' }}</div>
+      </div>
+      <div class="acts">
+        <button mat-icon-button (click)="showQr(t)" matTooltip="Show QR"><mat-icon>qr_code_2</mat-icon></button>
+        <a mat-icon-button [href]="t.url" target="_blank" rel="noopener" matTooltip="Open guest view"><mat-icon>open_in_new</mat-icon></a>
+        @if (staff.isOwner()) {
+          <button mat-icon-button (click)="rotate(t)" matTooltip="Issue new QR (old prints stop working)"><mat-icon>autorenew</mat-icon></button>
+          <button mat-icon-button (click)="remove(t)" matTooltip="Delete table"><mat-icon>delete_outline</mat-icon></button>
+        }
+      </div>
+    </mat-card>
+  }
+</div>
+
+@if (qr(); as q) {
+  <div class="qr-backdrop" (click)="qr.set(null)"></div>
+  <div class="qr-sheet" role="dialog" aria-label="Table QR code">
+    <div class="print-area">
+      <div class="venue">{{ staff.me()?.venue?.name }}</div>
+      <img [src]="q.dataUrl" [alt]="'QR code for table ' + q.tableNumber" />
+      <div class="tno">Table {{ q.tableNumber }}</div>
+      <div class="cta">Scan to view the menu &amp; order</div>
+    </div>
+    <code class="url">{{ q.url }}</code>
+    <div class="row">
+      <a mat-stroked-button [href]="q.dataUrl" [download]="'table-' + q.tableNumber + '-qr.png'"><mat-icon>download</mat-icon> PNG</a>
+      <button mat-stroked-button (click)="print()"><mat-icon>print</mat-icon> Print</button>
+      <button mat-flat-button (click)="qr.set(null)">Done</button>
+    </div>
+  </div>
+}
